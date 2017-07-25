@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="7"
+    android:background="@color/colorBackground"
+    tools:context="com.example.alexfanning.tictactoe.MainActivity">
+
+    <TextView
+        android:id="@+id/tvPlayer"
+        style="@style/TextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Player 1s turn" />
+
+    <!--Row top-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_weight="2"
+        >
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp02"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp12"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp22"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_weight="2"
+        >
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp01"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp11"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp21"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_weight="2"
+        >
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp00"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp10"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+
+        <com.example.alexfanning.tictactoe.BoardComponent
+            android:id="@+id/boardComp20"
+            android:layout_width="@dimen/standard_square"
+            android:onClick="boardCompCLicked"
+            android:layout_height="@dimen/standard_square" />
+    </LinearLayout>
+
+
+</LinearLayout>
