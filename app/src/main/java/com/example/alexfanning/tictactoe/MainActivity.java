@@ -5,11 +5,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.w3c.dom.Text;
+
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,16 +25,52 @@ public class MainActivity extends AppCompatActivity {
     private User mPlayer1;
     private User mPlayer2;
     private int numClicks = 0;
+    private static boolean sIsOnePlayerGame;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initialiseBoard();
-        create2PlayerGame();
+        sIsOnePlayerGame = false;
+        startGame();
+
     }
 
+    private void startGame(){
+        initialiseBoard();
+        if (sIsOnePlayerGame){
+            create1PlayerGame();
+        }else{
+            create2PlayerGame();
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.menu_1_player){
+            sIsOnePlayerGame = true;
+        }else if(id == R.id.menu_2_player){
+            sIsOnePlayerGame = false;
+        }
+        startGame();
+        return super.onOptionsItemSelected(item);
+    }
+
+
     private void initialiseBoard(){
+        if (mBoardComps != null){
+            clearBoard();
+        }
+
         mBoardComps = new BoardComponent[3][3];
 
         mTvPlayer = (TextView) findViewById(R.id.tvPlayer);
@@ -55,6 +97,26 @@ public class MainActivity extends AppCompatActivity {
         mBoardComps[1] = new BoardComponent[]{arr10,arr11,arr12};
         mBoardComps[2] = new BoardComponent[]{arr20,arr21,arr22};
 
+    }
+
+    private void clearBoard(){
+        for (int i = 0;i < 3;i++){
+            for (int j = 0;j<3;j++){
+                mBoardComps[i][j].clear();
+            }
+        }
+    }
+
+
+    private void create1PlayerGame(){
+        mPlayer1 = new User();
+        mPlayer1.setPlayer1(true);
+
+        mPlayer2 = new User();
+        mPlayer2.setComputer(true);
+
+        mIsPlayer1sGo = true;
+        setLabelGoText(mPlayer1);
     }
 
     private void create2PlayerGame(){
@@ -94,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
             bcClicked.setSelected(true);
             mIsPlayer1sGo=true;
         }
+        if (sIsOnePlayerGame){
+            computerMove();
+        }
         ++numClicks;
 
         if (numClicks > 4){
@@ -107,6 +172,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void computerMove() {
+        try{
+            TimeUnit.SECONDS.sleep(2);
+        }catch (InterruptedException e){
+            Log.e(TAG, "computerMove: Exception ");
+        }
+        boolean isSelected = false;
+        Random random = new Random();
+        while (!isSelected){
+            int x = random.nextInt(0) + 3;
+            int y = random.nextInt(0) + 3;
+            BoardComponent bc = mBoardComps[x][y];
+            if (!bc.isSelected()){
+                bc.setBackground(getDrawable(R.drawable.ic_y));
+                setLabelGoText(mPlayer1);
+                bc.setSelected(true);
+                mIsPlayer1sGo=true;
+            }
+        }
+    }
+
+
     private void checkDiagonals(){
         if (!mBoardComps[1][1].isSelected()){return ;}
         Bitmap bitmapDrawableX = ((BitmapDrawable) getDrawable(R.drawable.ic_x)).getBitmap();
@@ -115,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (BoardComponent.getBitmap(mBoardComps[1][1]) == bitmapDrawableX) {
             bitmapToCheck = bitmapDrawableX;
-        }else if(BoardComponent.getBitmap(mBoardComps[1][1]) == bitmapDrawableX){
+        }else if(BoardComponent.getBitmap(mBoardComps[1][1]) == bitmapDrawableY){
             bitmapToCheck = bitmapDrawableY;
         }
         if (BoardComponent.getBitmap(mBoardComps[0][2]) == bitmapToCheck && BoardComponent.getBitmap(mBoardComps[2][0]) == bitmapToCheck){
@@ -125,6 +212,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
 
     private void checkIsWinner(boolean checkIsYAxis){
         boolean isWinner = false;

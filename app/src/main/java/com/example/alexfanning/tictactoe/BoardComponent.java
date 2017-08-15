@@ -30,31 +30,42 @@ public class BoardComponent extends ImageButton {
             return null;
         }
 
-
     }
 
 
 //    Default Image Button constructors
     public BoardComponent(Context c){
         super(c);
+        setBackground(c.getDrawable(R.drawable.ic_empty));
     }
 
-    public BoardComponent(Context c, AttributeSet atts){
+    public BoardComponent(Context c, AttributeSet atts)
+    {
         super(c, atts);
+        setBackground(c.getDrawable(R.drawable.ic_empty));
     }
 
     public BoardComponent(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        setBackground(context.getDrawable(R.drawable.ic_empty));
     }
 
     public BoardComponent(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        setBackground(context.getDrawable(R.drawable.ic_empty));
     }
 
     public void setCoors(int x, int y){
         this.xAxis = x;
         this.yAxis = y;
     }
+
+    public void clear(){
+        setBackground(null);
+        isSelected = false;
+    }
+
+
 
     public int getxAxis() {
         return xAxis;
@@ -81,7 +92,7 @@ public class BoardComponent extends ImageButton {
     }
 
 
-    public boolean isSelected() {
+    public boolean checkIsSelected() {
         return isSelected;
     }
 

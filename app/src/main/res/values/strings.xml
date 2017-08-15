@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TicTacToe</string>
+
+    <!--MenuItems-->
+    <string name="menu_2_player">New 2 Player Game</string>
+    <string name="menu_computer">New 1 Player Game</string>
 </resources>
