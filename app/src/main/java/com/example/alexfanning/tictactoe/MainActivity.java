@@ -1,11 +1,12 @@
 package com.example.alexfanning.tictactoe;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         sIsOnePlayerGame = false;
         startGame();
-
     }
 
     private void startGame(){
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         if (mBoardComps != null){
             clearBoard();
         }
-
+        numClicks = 0;
         mBoardComps = new BoardComponent[3][3];
 
         mTvPlayer = (TextView) findViewById(R.id.tvPlayer);
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     private void clearBoard(){
         for (int i = 0;i < 3;i++){
             for (int j = 0;j<3;j++){
-                mBoardComps[i][j].clear();
+                mBoardComps[i][j].clear(this);
             }
         }
     }
@@ -142,28 +142,29 @@ public class MainActivity extends AppCompatActivity {
 
     public void boardCompCLicked(View view) {
         BoardComponent bcClicked = (BoardComponent)view;
-        if (bcClicked.isSelected()){return;}
+        if (bcClicked.checkIsSelected()){return;}
         if (mIsPlayer1sGo){
-            bcClicked.setBackground(getDrawable(R.drawable.ic_x));
-//            bcClicked.setBackgroundColor(ContextCompat.getColor(this,R.color.colorPlayer1));
-            bcClicked.setSelected(true);
+            bcClicked.setIsX(true,this);
             setLabelGoText(mPlayer2);
             mIsPlayer1sGo=false;
         }else if (!mIsPlayer1sGo){
-//            bcClicked.setBackgroundColor(ContextCompat.getColor(this,R.color.colorPlayer2));
-            bcClicked.setBackground(getDrawable(R.drawable.ic_y));
+            bcClicked.setIsY(true,this);
             setLabelGoText(mPlayer1);
-            bcClicked.setSelected(true);
             mIsPlayer1sGo=true;
         }
+        ++numClicks;
+        checkClicks();
         if (sIsOnePlayerGame){
             computerMove();
+            ++numClicks;
         }
-        ++numClicks;
+        checkClicks();
+    }
 
+    private void checkClicks(){
         if (numClicks > 4){
             boolean checkIsYAxis = true;
-           checkDiagonals();
+            checkDiagonals();
             for (int i = 0;i<2;i++){
                 checkIsWinner(checkIsYAxis);
                 checkIsYAxis = false;
@@ -173,43 +174,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void computerMove() {
-        try{
-            TimeUnit.SECONDS.sleep(2);
-        }catch (InterruptedException e){
-            Log.e(TAG, "computerMove: Exception ");
-        }
-        boolean isSelected = false;
-        Random random = new Random();
-        while (!isSelected){
-            int x = random.nextInt(0) + 3;
-            int y = random.nextInt(0) + 3;
-            BoardComponent bc = mBoardComps[x][y];
-            if (!bc.isSelected()){
-                bc.setBackground(getDrawable(R.drawable.ic_y));
-                setLabelGoText(mPlayer1);
-                bc.setSelected(true);
-                mIsPlayer1sGo=true;
+        Handler handler = new Handler();
+        Runnable r=new Runnable() {
+            public void run() {
+                boolean isSelected = false;
+
+                while (!isSelected){
+                    int x = getRandom();
+                    int y = getRandom();
+                    BoardComponent bc = mBoardComps[x][y];
+                    if (!bc.checkIsSelected()){
+                        bc.setIsY(true,getApplicationContext());
+                        setLabelGoText(mPlayer1);
+                        isSelected = true;
+                        mIsPlayer1sGo=true;
+                    }
+                }
             }
-        }
+        };
+        handler.postDelayed(r, 1000);
+
     }
 
+    private int getRandom(){
+        Random rn = new Random();
+        int range = 2 - 0 + 1;
+        int randomNum =  rn.nextInt(range) + 0;
+        return randomNum;
+    }
 
     private void checkDiagonals(){
-        if (!mBoardComps[1][1].isSelected()){return ;}
-        Bitmap bitmapDrawableX = ((BitmapDrawable) getDrawable(R.drawable.ic_x)).getBitmap();
-        Bitmap bitmapDrawableY = ((BitmapDrawable) getDrawable(R.drawable.ic_y)).getBitmap();
-        Bitmap bitmapToCheck = null;
+        if (!mBoardComps[1][1].checkIsSelected()){return ;}
 
-        if (BoardComponent.getBitmap(mBoardComps[1][1]) == bitmapDrawableX) {
-            bitmapToCheck = bitmapDrawableX;
-        }else if(BoardComponent.getBitmap(mBoardComps[1][1]) == bitmapDrawableY){
-            bitmapToCheck = bitmapDrawableY;
-        }
-        if (BoardComponent.getBitmap(mBoardComps[0][2]) == bitmapToCheck && BoardComponent.getBitmap(mBoardComps[2][0]) == bitmapToCheck){
+        if (mBoardComps[1][1].isX()) {
+            if ((mBoardComps[0][2].isX()&& mBoardComps[2][0].isX()) || mBoardComps[0][0].isX()&& mBoardComps[2][2].isX()){
                 gameOver(mPlayer1);
-        }else if (BoardComponent.getBitmap(mBoardComps[0][0]) == bitmapToCheck && BoardComponent.getBitmap(mBoardComps[2][2]) == bitmapToCheck){
-            gameOver(mPlayer1);
+            }
+        }else if(mBoardComps[1][1].isY()){
+            if ((mBoardComps[0][2].isY()&& mBoardComps[2][0].isY()) || mBoardComps[0][0].isY()&& mBoardComps[2][2].isY()){
+                gameOver(mPlayer2);
+            }
         }
+
+
 
     }
 
@@ -229,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedBc = mBoardComps[j][i];
                 }
 
-                if (selectedBc.isSelected()){
+                if (selectedBc.checkIsSelected()){
 
                     Bitmap bitmapBc = BoardComponent.getBitmap(selectedBc) ; //selectedBc.getBitmap(); //((BitmapDrawable) selectedBc.getBackground()).getBitmap();
                     Bitmap bitmapDrawableX = ((BitmapDrawable) getDrawable(R.drawable.ic_x)).getBitmap();

@@ -18,7 +18,8 @@ public class BoardComponent extends ImageButton {
 
     private int xAxis;
     private int yAxis;
-    private boolean isX;
+    private boolean isX = false;
+    private boolean isY = false;
     private boolean isSelected = false;
 
 
@@ -60,8 +61,8 @@ public class BoardComponent extends ImageButton {
         this.yAxis = y;
     }
 
-    public void clear(){
-        setBackground(null);
+    public void clear(Context c){
+        setBackground(c.getDrawable(R.drawable.ic_empty));
         isSelected = false;
     }
 
@@ -87,8 +88,20 @@ public class BoardComponent extends ImageButton {
         return isX;
     }
 
-    public void setX(boolean x) {
-        isX = x;
+    public void setIsX(boolean x,Context c) {
+        isY = x;
+        setBackground(c.getDrawable(R.drawable.ic_x));
+        isSelected = true;
+    }
+
+    public boolean isY() {
+        return isX;
+    }
+
+    public void setIsY(boolean y, Context c) {
+        isY = y;
+        setBackground(c.getDrawable(R.drawable.ic_y));
+        isSelected = false;
     }
 
 
