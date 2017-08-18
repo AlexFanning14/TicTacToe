@@ -32,12 +32,14 @@
             android:id="@+id/boardComp02"
             android:layout_width="@dimen/standard_square"
             android:onClick="boardCompCLicked"
+            android:contentDescription="@string/content_descript_empty"
             android:layout_margin="@dimen/margin_standard"
             android:layout_height="@dimen/standard_square" />
 
         <com.example.alexfanning.tictactoe.BoardComponent
             android:id="@+id/boardComp12"
             android:layout_width="@dimen/standard_square"
+            android:contentDescription="@string/content_descript_empty"
             android:layout_margin="@dimen/margin_standard"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
@@ -45,6 +47,7 @@
         <com.example.alexfanning.tictactoe.BoardComponent
             android:id="@+id/boardComp22"
             android:layout_margin="@dimen/margin_standard"
+            android:contentDescription="@string/content_descript_empty"
             android:layout_width="@dimen/standard_square"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
@@ -62,6 +65,7 @@
             android:id="@+id/boardComp01"
             android:layout_margin="@dimen/margin_standard"
             android:layout_width="@dimen/standard_square"
+            android:contentDescription="@string/content_descript_empty"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
 
@@ -69,6 +73,7 @@
             android:id="@+id/boardComp11"
             android:layout_margin="@dimen/margin_standard"
             android:layout_width="@dimen/standard_square"
+            android:contentDescription="@string/content_descript_empty"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
 
@@ -76,6 +81,7 @@
             android:id="@+id/boardComp21"
             android:layout_margin="@dimen/margin_standard"
             android:layout_width="@dimen/standard_square"
+            android:contentDescription="@string/content_descript_empty"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
     </LinearLayout>
@@ -92,6 +98,7 @@
             android:id="@+id/boardComp00"
             android:layout_margin="@dimen/margin_standard"
             android:layout_width="@dimen/standard_square"
+            android:contentDescription="@string/content_descript_empty"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
 
@@ -99,6 +106,7 @@
             android:id="@+id/boardComp10"
             android:layout_width="@dimen/standard_square"
             android:layout_margin="@dimen/margin_standard"
+            android:contentDescription="@string/content_descript_empty"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
 
@@ -106,6 +114,7 @@
             android:id="@+id/boardComp20"
             android:layout_margin="@dimen/margin_standard"
             android:layout_width="@dimen/standard_square"
+            android:contentDescription="@string/content_descript_empty"
             android:onClick="boardCompCLicked"
             android:layout_height="@dimen/standard_square" />
     </LinearLayout>

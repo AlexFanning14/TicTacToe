@@ -4,7 +4,9 @@ package com.example.alexfanning.tictactoe;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.RippleDrawable;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
 
@@ -19,7 +21,7 @@ public class BoardComponent extends ImageButton {
     private int xAxis;
     private int yAxis;
     private boolean isX = false;
-    private boolean isY = false;
+    private boolean isO = false;
     private boolean isSelected = false;
 
 
@@ -53,6 +55,7 @@ public class BoardComponent extends ImageButton {
 
     public BoardComponent(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+
         setBackground(context.getDrawable(R.drawable.ic_empty));
     }
 
@@ -89,30 +92,61 @@ public class BoardComponent extends ImageButton {
     }
 
     public void setIsX(boolean x,Context c) {
-        isY = x;
+        isX = x;
         setBackground(c.getDrawable(R.drawable.ic_x));
+        setContentDescription("X");
         isSelected = true;
     }
 
-    public boolean isY() {
-        return isX;
+    public boolean isO() {
+        return isO;
     }
 
-    public void setIsY(boolean y, Context c) {
-        isY = y;
-        setBackground(c.getDrawable(R.drawable.ic_y));
-        isSelected = false;
+    public void setIsO(boolean o, Context c) {
+        isO = o;
+        setBackground(c.getDrawable(R.drawable.ic_o));
+        setContentDescription("O");
+        isSelected = true;
     }
-
 
     public boolean checkIsSelected() {
         return isSelected;
     }
-
 
     public void setSelected(boolean selected) {
         this.isSelected = selected;
     }
 
 
+//    Parceable
+
+//    private int xAxis;
+//    private int yAxis;
+//    private boolean isX = false;
+//    private boolean isO = false;
+//    private boolean isSelected = false;
+
+    public Parcelable onSaveInstance(){
+        Bundle b = new Bundle();
+        b.putParcelable("superState", super.onSaveInstanceState());
+        b.putInt("xAxis",xAxis);
+        b.putInt("yAxis",yAxis);
+        b.putBoolean("isX",isX);
+        b.putBoolean("isO",isO);
+        b.putBoolean("isSelected",isSelected);
+        return b;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle){
+            Bundle b = (Bundle) state;
+            xAxis = b.getInt("xAxis");
+            yAxis = b.getInt("yAxis");
+            isX = b.getBoolean("isX");
+            isO = b.getBoolean("isO");
+            isSelected = b.getBoolean("isSelected");
+        }
+        super.onRestoreInstanceState(state);
+    }
 }

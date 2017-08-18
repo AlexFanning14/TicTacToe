@@ -1,40 +1,39 @@
 package com.example.alexfanning.tictactoe;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.content.DialogInterface;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
+import android.os.PersistableBundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BoardComponent[][] mBoardComps;
+    private BoardComponent[][] mBoardComps = null;
     private TextView mTvPlayer;
     private boolean mIsPlayer1sGo;
     private User mPlayer1;
     private User mPlayer2;
     private int numClicks = 0;
     private static boolean sIsOnePlayerGame;
+
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static boolean isOver = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sIsOnePlayerGame = false;
-        startGame();
+
+            generateMenuDialog(false,"");
+
     }
 
     private void startGame(){
@@ -70,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         if (mBoardComps != null){
             clearBoard();
         }
+        isOver = false;
         numClicks = 0;
         mBoardComps = new BoardComponent[3][3];
 
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void boardCompCLicked(View view) {
+        if (sIsOnePlayerGame && !mIsPlayer1sGo){return;}
         BoardComponent bcClicked = (BoardComponent)view;
         if (bcClicked.checkIsSelected()){return;}
         if (mIsPlayer1sGo){
@@ -148,25 +149,32 @@ public class MainActivity extends AppCompatActivity {
             setLabelGoText(mPlayer2);
             mIsPlayer1sGo=false;
         }else if (!mIsPlayer1sGo){
-            bcClicked.setIsY(true,this);
+            bcClicked.setIsO(true,this);
             setLabelGoText(mPlayer1);
             mIsPlayer1sGo=true;
         }
         ++numClicks;
         checkClicks();
-        if (sIsOnePlayerGame){
+        if (sIsOnePlayerGame && !isOver){
             computerMove();
-            ++numClicks;
+
+            checkClicks();
         }
-        checkClicks();
+
     }
 
     private void checkClicks(){
         if (numClicks > 4){
+            if (numClicks == 9){
+                isOver = true;
+                generateMenuDialog(true,"Draw game!");
+                return;
+            }
             boolean checkIsYAxis = true;
             checkDiagonals();
             for (int i = 0;i<2;i++){
                 checkIsWinner(checkIsYAxis);
+                if (isOver){return;}
                 checkIsYAxis = false;
             }
 
@@ -177,29 +185,105 @@ public class MainActivity extends AppCompatActivity {
         Handler handler = new Handler();
         Runnable r=new Runnable() {
             public void run() {
-                boolean isSelected = false;
-
-                while (!isSelected){
-                    int x = getRandom();
-                    int y = getRandom();
-                    BoardComponent bc = mBoardComps[x][y];
-                    if (!bc.checkIsSelected()){
-                        bc.setIsY(true,getApplicationContext());
+                smartComputerMove();
+                ++numClicks;
+//                boolean isSelected = false;
+//
+//                while (!isSelected){
+//                    int x = getRandom(0,2);
+//                    int y = getRandom(0,2);
+//                    BoardComponent bc = mBoardComps[x][y];
+//                    if (!bc.checkIsSelected()){
+//                        bc.setIsO(true,getApplicationContext());
                         setLabelGoText(mPlayer1);
-                        isSelected = true;
+                        //isSelected = true;
+
+
                         mIsPlayer1sGo=true;
-                    }
-                }
+//                    }
+//                }
             }
         };
         handler.postDelayed(r, 1000);
 
     }
 
-    private int getRandom(){
+    private void smartComputerMove(){
+        if (numClicks == 1) {
+            if (mBoardComps[1][1].checkIsSelected()){
+                int x = getRandom(1,4);
+                switch(x){
+                    case 1:
+                        mBoardComps[0][0].setIsO(true,this);
+                    case 2:
+                        mBoardComps[2][0].setIsO(true,this);
+                    case 3:
+                        mBoardComps[2][0].setIsO(true,this);
+                    case 4:
+                        mBoardComps[2][0].setIsO(true,this);
+                }
+        }else{
+                mBoardComps[1][1].setIsO(true,this);
+            }
+        }else if (numClicks > 1){
+            boolean checkIsYAxis = false;
+            boolean isSelected = false;
+            int i = 0;
+            while(!isSelected){
+                    int numSelectedPlayer1 = 0;
+                    ArrayList<BoardComponent> row = new ArrayList<>();
+                    for (int j = 0; j < 3; ++j) {
+
+                        BoardComponent selectedBc = null;
+                        if (checkIsYAxis) {
+                            selectedBc = mBoardComps[i][j];
+                        } else {
+                            selectedBc = mBoardComps[j][i];
+                        }
+
+                        if (selectedBc.checkIsSelected()) {
+                            if (selectedBc.isX()) {
+                                numSelectedPlayer1++;
+                            }
+                        }else{
+                            row.add(selectedBc);
+                        }
+                    }
+                    if (numSelectedPlayer1 == 2) {
+                        if (row.size() > 0){
+                            row.get(0).setIsO(true,this);
+
+                        }
+                        i++;
+                }
+                checkIsYAxis = true;
+            }
+            if (!isSelected){selectRandom();}
+
+        }
+    }
+
+    private void selectRandom() {
+        boolean isSelected = false;
+
+        while (!isSelected) {
+            int x = getRandom(0, 2);
+            int y = getRandom(0, 2);
+            BoardComponent bc = mBoardComps[x][y];
+            if (!bc.checkIsSelected()) {
+                bc.setIsO(true, getApplicationContext());
+                setLabelGoText(mPlayer1);
+                isSelected = true;
+                mIsPlayer1sGo = true;
+            }
+        }
+    }
+
+
+    private int getRandom(int min, int max){
         Random rn = new Random();
-        int range = 2 - 0 + 1;
-        int randomNum =  rn.nextInt(range) + 0;
+        int range = max - min + 1;
+        int randomNum =  rn.nextInt(range) + min;
         return randomNum;
     }
 
@@ -210,13 +294,11 @@ public class MainActivity extends AppCompatActivity {
             if ((mBoardComps[0][2].isX()&& mBoardComps[2][0].isX()) || mBoardComps[0][0].isX()&& mBoardComps[2][2].isX()){
                 gameOver(mPlayer1);
             }
-        }else if(mBoardComps[1][1].isY()){
-            if ((mBoardComps[0][2].isY()&& mBoardComps[2][0].isY()) || mBoardComps[0][0].isY()&& mBoardComps[2][2].isY()){
+        }else if(mBoardComps[1][1].isO()){
+            if ((mBoardComps[0][2].isO()&& mBoardComps[2][0].isO()) || mBoardComps[0][0].isO()&& mBoardComps[2][2].isO()){
                 gameOver(mPlayer2);
             }
         }
-
-
 
     }
 
@@ -237,50 +319,64 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (selectedBc.checkIsSelected()){
-
-                    Bitmap bitmapBc = BoardComponent.getBitmap(selectedBc) ; //selectedBc.getBitmap(); //((BitmapDrawable) selectedBc.getBackground()).getBitmap();
-                    Bitmap bitmapDrawableX = ((BitmapDrawable) getDrawable(R.drawable.ic_x)).getBitmap();
-                    Bitmap bitmapDrawableY = ((BitmapDrawable) getDrawable(R.drawable.ic_y)).getBitmap();
-                    if (bitmapBc == bitmapDrawableX){
+                    if (selectedBc.isX()){
                         numSelectedPlayer1++;
-                    }else if (bitmapBc == bitmapDrawableY){
+                    }else if (selectedBc.isO()){
                         numSelectedPlayer2++;
                     }
                 }
             }
             if (numSelectedPlayer1 == 3){
                 isWinner = true;
-//                Player 1 is the winner
             }else if (numSelectedPlayer2 == 3){
                 isWinner = true;
-//                Player 2 is the winner
             }
         }
 
         if (isWinner){
             gameOver(mPlayer1);
-            return;
         }
     }
-//    WInner Checks
-//    private boolean xAxisCheck(){
-//        for (int i = 0; i < 3; ++i){
-//            int numSelected = 0;
-//            for (int j = 0; i < 3; ++i){
-//                if (mBoardComps[i][j].isSelected())
-//                    numSelected++;
-//            }
-//            if (numSelected == 3){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//    private boolean xAxisCheck(){
+
 
     private void gameOver(User user){
-        Toast.makeText(this,"WINNER",Toast.LENGTH_LONG).show();
+        String winner = "";
+        if (user.getIsPlayer1()){
+            winner = "Player 1 has won!";
+        }else if (user.getIsPlayer2()){
+            winner = "Player 2 has won!";
+        }else if (user.getIsComputer()){
+            winner = "Computer has won!";
+        }
+        isOver = true;
+        generateMenuDialog(true,winner);
 
+    }
+
+    private void generateMenuDialog(boolean wasWinner, String whoWOn){
+        final CharSequence menus[] = new CharSequence[]{"One Player Game", "Two Player Game"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        String title = "";
+        if (wasWinner){
+            title = whoWOn + "\nChoose Game Mode";
+        }else{
+            title = whoWOn + "Choose Game Mode";
+        }
+        builder.setTitle(title);
+
+        builder.setItems(menus, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0){
+                    sIsOnePlayerGame = true;
+                }else{
+                    sIsOnePlayerGame = false;
+                }
+                startGame();
+            }
+        });
+        builder.show();
     }
 
 
