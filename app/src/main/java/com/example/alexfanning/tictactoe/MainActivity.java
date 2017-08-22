@@ -182,9 +182,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void computerMove() {
-        Handler handler = new Handler();
-        Runnable r=new Runnable() {
-            public void run() {
+//        Handler handler = new Handler();
+//        Runnable r=new Runnable() {
+//            public void run() {
                 smartComputerMove();
                 ++numClicks;
 //                boolean isSelected = false;
@@ -202,66 +202,84 @@ public class MainActivity extends AppCompatActivity {
                         mIsPlayer1sGo=true;
 //                    }
 //                }
-            }
-        };
-        handler.postDelayed(r, 1000);
+
+//        };
+//        handler.postDelayed(r, 1000);
 
     }
 
-    private void smartComputerMove(){
+    private void smartComputerMove() {
         if (numClicks == 1) {
-            if (mBoardComps[1][1].checkIsSelected()){
-                int x = getRandom(1,4);
-                switch(x){
-                    case 1:
-                        mBoardComps[0][0].setIsO(true,this);
-                    case 2:
-                        mBoardComps[2][0].setIsO(true,this);
-                    case 3:
-                        mBoardComps[2][0].setIsO(true,this);
-                    case 4:
-                        mBoardComps[2][0].setIsO(true,this);
-                }
-        }else{
-                mBoardComps[1][1].setIsO(true,this);
+            selectFirstCompMove();
+
+        } else if (numClicks > 1) {
+            if (!checkForTwoInRow()){
+                selectRandom();
             }
-        }else if (numClicks > 1){
-            boolean checkIsYAxis = false;
-            boolean isSelected = false;
-            int i = 0;
-            while(!isSelected){
-                    int numSelectedPlayer1 = 0;
-                    ArrayList<BoardComponent> row = new ArrayList<>();
-                    for (int j = 0; j < 3; ++j) {
-
-                        BoardComponent selectedBc = null;
-                        if (checkIsYAxis) {
-                            selectedBc = mBoardComps[i][j];
-                        } else {
-                            selectedBc = mBoardComps[j][i];
-                        }
-
-                        if (selectedBc.checkIsSelected()) {
-                            if (selectedBc.isX()) {
-                                numSelectedPlayer1++;
-                            }
-                        }else{
-                            row.add(selectedBc);
-                        }
-                    }
-                    if (numSelectedPlayer1 == 2) {
-                        if (row.size() > 0){
-                            row.get(0).setIsO(true,this);
-
-                        }
-                        i++;
-                }
-                checkIsYAxis = true;
-            }
-            if (!isSelected){selectRandom();}
 
         }
     }
+
+
+    private void selectFirstCompMove(){
+        if (mBoardComps[1][1].checkIsSelected()){
+            int x = getRandom(1,4);
+            switch(x){
+                case 1:
+                    mBoardComps[0][0].setIsO(true,this);
+                case 2:
+                    mBoardComps[2][0].setIsO(true,this);
+                case 3:
+                    mBoardComps[2][0].setIsO(true,this);
+                case 4:
+                    mBoardComps[2][0].setIsO(true,this);
+            }
+        }else{
+            mBoardComps[1][1].setIsO(true,this);
+        }
+    }
+
+        private boolean checkForTwoInRow(){
+            boolean checkIsYAxis = false;
+            for (int k = 0; k < 2; ++k) {
+
+            for(int i = 0; i < 3; ++i){
+                int numSelectedPlayer1 = 0;
+                ArrayList<BoardComponent> row = new ArrayList<>();
+                for (int j = 0; j < 3; ++j) {
+
+                    BoardComponent selectedBc;
+                    if (checkIsYAxis) {
+                        selectedBc = mBoardComps[i][j];
+                    } else {
+                        selectedBc = mBoardComps[j][i];
+                    }
+
+                    if (selectedBc.checkIsSelected()) {
+                        if (selectedBc.isX()) {
+                            numSelectedPlayer1++;
+                        }
+                    }else{
+                        row.add(selectedBc);
+                    }
+                }
+                if (numSelectedPlayer1 == 2) {
+                    if (row.size() > 0){
+                        row.get(0).setIsO(true,this);
+                        return true;
+                    }
+                }
+            }
+            checkIsYAxis = true;
+            }
+            return false;
+
+    }
+
+
+
+
+
 
     private void selectRandom() {
         boolean isSelected = false;
